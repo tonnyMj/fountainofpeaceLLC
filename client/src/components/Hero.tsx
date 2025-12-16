@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 const Hero = () => {
     const [images, setImages] = useState<string[]>([
         "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=2070"
@@ -12,13 +14,13 @@ const Hero = () => {
     useEffect(() => {
         const fetchImages = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/images?type=hero');
+                const response = await fetch(`${API_URL}/api/images?type=hero`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data.length > 0) {
                         // Append backend images to the default one or replace it
                         // Let's replace the default if user supplied ANY images
-                        setImages(data.map((img: string) => `http://localhost:5000${img}`));
+                        setImages(data.map((img: string) => `${API_URL}${img}`));
                     }
                 }
             } catch (error) {

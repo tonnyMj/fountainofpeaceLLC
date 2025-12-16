@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { ImageIcon } from 'lucide-react';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const Gallery = () => {
     const [images, setImages] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
@@ -9,7 +11,7 @@ const Gallery = () => {
     useEffect(() => {
         const fetchImages = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/images?type=gallery');
+                const response = await fetch(`${API_URL}/api/images?type=gallery`);
                 if (response.ok) {
                     const data = await response.json();
                     setImages(data);
@@ -41,7 +43,7 @@ const Gallery = () => {
             {images.map((img, index) => (
                 <div key={index} className="aspect-square relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-shadow">
                     <img
-                        src={`http://localhost:5000${img}`}
+                        src={`${API_URL}${img}`}
                         alt={`Gallery image ${index + 1}`}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />

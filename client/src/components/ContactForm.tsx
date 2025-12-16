@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Send, CheckCircle, AlertCircle } from 'lucide-react';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 const ContactForm = () => {
     const [formData, setFormData] = useState({
         name: '',
@@ -23,7 +25,7 @@ const ContactForm = () => {
         setStatus('loading');
 
         try {
-            const response = await fetch('http://localhost:5000/api/contact', {
+            const response = await fetch(`${API_URL}/api/contact`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

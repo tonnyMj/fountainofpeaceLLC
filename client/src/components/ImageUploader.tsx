@@ -3,6 +3,8 @@ import { Upload, CheckCircle, AlertCircle, Trash2, X } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
 import ConfirmationModal from './ui/ConfirmationModal';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 interface ImageUploaderProps {
     imageType?: 'hero' | 'gallery';
     onUploadSuccess?: () => void;
@@ -20,7 +22,7 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
 
     const fetchExistingImages = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/images?type=${imageType}`);
+            const response = await fetch(`${API_URL}/api/images?type=${imageType}`);
             if (response.ok) {
                 const data = await response.json();
                 setExistingImages(data);
@@ -57,7 +59,7 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/upload', {
+            const response = await fetch(`${API_URL}/api/upload`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -99,7 +101,7 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/images/${imageToDelete}`, {
+            const response = await fetch(`${API_URL}/api/images/${imageToDelete}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -176,7 +178,7 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
                             return (
                                 <div key={index} className="aspect-square relative rounded-lg overflow-hidden border border-gray-200 group">
                                     <img
-                                        src={`http://localhost:5000${img}`}
+                                        src={`${API_URL}${img}`}
                                         alt={`Existing ${index}`}
                                         className="w-full h-full object-cover"
                                     />

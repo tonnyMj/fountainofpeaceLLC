@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Upload, Check, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 interface ServiceImageManagerProps { }
 
 const serviceTypes = [
@@ -24,10 +26,10 @@ const ServiceImageManager = ({ }: ServiceImageManagerProps) => {
         const loadedImages: Record<string, string> = {};
         for (const service of serviceTypes) {
             try {
-                const res = await fetch(`http://localhost:5000/api/images?type=${service.type}`);
+                const res = await fetch(`${API_URL}/api/images?type=${service.type}`);
                 const data = await res.json();
                 if (data.length > 0) {
-                    loadedImages[service.type] = `http://localhost:5000${data[0]}`;
+                    loadedImages[service.type] = `${API_URL}${data[0]}`;
                 }
             } catch (err) {
                 console.error(`Failed to load image for ${service.type}`);
@@ -48,7 +50,7 @@ const ServiceImageManager = ({ }: ServiceImageManagerProps) => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/upload', {
+            const response = await fetch(`${API_URL}/api/upload`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData,

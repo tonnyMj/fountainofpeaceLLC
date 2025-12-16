@@ -3,6 +3,8 @@
 import { Clock, ShieldCheck, Heart, Utensils, Home, Smile } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 interface ServiceImage {
     type: string;
     url: string;
@@ -18,10 +20,10 @@ export default function Services() {
 
             for (const type of types) {
                 try {
-                    const res = await fetch(`http://localhost:5000/api/images?type=${type}`);
+                    const res = await fetch(`${API_URL}/api/images?type=${type}`);
                     const data = await res.json();
                     if (data.length > 0) {
-                        images[type] = `http://localhost:5000${data[0]}`;
+                        images[type] = `${API_URL}${data[0]}`;
                     }
                 } catch (err) {
                     console.error(`Failed to fetch ${type} image`);

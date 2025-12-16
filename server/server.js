@@ -5,11 +5,23 @@ const { Sequelize, DataTypes } = require('sequelize');
 const path = require('path');
 const fs = require('fs');
 
+// Load environment variables
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
+// CORS Configuration
+const allowedOrigins = process.env.FRONTEND_URLS
+  ? process.env.FRONTEND_URLS.split(',')
+  : ['http://localhost:3000'];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(bodyParser.json());
 
 // Database Setup (SQLite)
@@ -78,7 +90,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-const SECRET_KEY = "supersecretkey123"; // In production, use process.env.SECRET_KEY
+const SECRET_KEY = process.env.SECRET_KEY || "supersecretkey123";
 
 // User Model
 const User = sequelize.define('User', {
