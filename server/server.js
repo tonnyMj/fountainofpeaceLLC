@@ -24,12 +24,26 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
-// Database Setup (SQLite)
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: path.join(__dirname, 'database.sqlite'),
-  logging: false, // Set to console.log to see SQL queries
-});
+// Database Setup (Postgres for Prod, SQLite for Dev)
+let sequelize;
+if (process.env.DATABASE_URL) {
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    },
+    logging: false
+  });
+} else {
+  sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: path.join(__dirname, 'database.sqlite'),
+    logging: false,
+  });
+}
 
 // Models
 const Inquiry = sequelize.define('Inquiry', {
