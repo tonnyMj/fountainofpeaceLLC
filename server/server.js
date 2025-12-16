@@ -146,11 +146,12 @@ const Image = sequelize.define('Image', {
 // Seed default service images
 const seedServiceImages = async () => {
   const serviceImages = [
-    { filename: 'service_supervision.png', type: 'service_supervision' },
-    { filename: 'service_healthcare.png', type: 'service_healthcare' },
-    { filename: 'service_adl.png', type: 'service_adl' },
-    { filename: 'service_meals.png', type: 'service_meals' },
-    { filename: 'service_housekeeping.png', type: 'service_housekeeping' },
+    { filename: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=600', type: 'service_supervision' },
+    { filename: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=600', type: 'service_healthcare' },
+    { filename: 'https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?auto=format&fit=crop&q=80&w=600', type: 'service_adl' },
+    { filename: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&q=80&w=600', type: 'service_meals' },
+    { filename: 'https://images.unsplash.com/photo-1581578731117-104f2a41272c?auto=format&fit=crop&q=80&w=600', type: 'service_housekeeping' },
+    { filename: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=600', type: 'service_social' },
   ];
 
   for (const img of serviceImages) {
