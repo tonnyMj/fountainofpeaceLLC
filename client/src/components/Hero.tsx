@@ -1,7 +1,6 @@
-"use client";
-
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -18,9 +17,6 @@ const Hero = () => {
                 if (response.ok) {
                     const data = await response.json();
                     if (data.length > 0) {
-                        // Append backend images to the default one or replace it
-                        // Let's replace the default if user supplied ANY images
-                        // Cloudinary URLs are already complete
                         setImages(data);
                     }
                 }
@@ -36,14 +32,30 @@ const Hero = () => {
 
         const interval = setInterval(() => {
             setCurrentIndex((prev) => (prev + 1) % images.length);
-        }, 5000); // Change every 5 seconds
+        }, 5000);
 
         return () => clearInterval(interval);
     }, [images]);
 
+    const prevSlide = () => {
+        const isFirstSlide = currentIndex === 0;
+        const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
+        setCurrentIndex(newIndex);
+    };
+
+    const nextSlide = () => {
+        const isLastSlide = currentIndex === images.length - 1;
+        const newIndex = isLastSlide ? 0 : currentIndex + 1;
+        setCurrentIndex(newIndex);
+    };
+
+    const goToSlide = (slideIndex: number) => {
+        setCurrentIndex(slideIndex);
+    };
+
     return (
-        <section className="relative h-[600px] flex items-center justify-center text-center bg-gray-900 overflow-hidden">
-            {/* Background Images with Fade Transition */}
+        <section className="relative h-[600px] flex items-center justify-center text-center bg-gray-900 overflow-hidden group">
+            {/* Background Images */}
             {images.map((img, index) => (
                 <div
                     key={index}
@@ -53,9 +65,38 @@ const Hero = () => {
                 />
             ))}
 
-            {/* Fallback overlay color */}
+            {/* Overlay */}
             <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 to-gray-900/80 z-0"></div>
 
+            {/* Left Arrow */}
+            {images.length > 1 && (
+                <div className="absolute top-[50%] -translate-x-0 translate-y-[-50%] left-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer hover:bg-black/50 transition-colors z-20 hidden md:block group-hover:block">
+                    <ChevronLeft onClick={prevSlide} size={30} />
+                </div>
+            )}
+
+            {/* Right Arrow */}
+            {images.length > 1 && (
+                <div className="absolute top-[50%] -translate-x-0 translate-y-[-50%] right-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer hover:bg-black/50 transition-colors z-20 hidden md:block group-hover:block">
+                    <ChevronRight onClick={nextSlide} size={30} />
+                </div>
+            )}
+
+            {/* Dots */}
+            {images.length > 1 && (
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+                    {images.map((_, slideIndex) => (
+                        <div
+                            key={slideIndex}
+                            onClick={() => goToSlide(slideIndex)}
+                            className={`text-2xl cursor-pointer w-3 h-3 rounded-full transition-all ${currentIndex === slideIndex ? 'bg-white scale-110' : 'bg-white/50 hover:bg-white/80'
+                                }`}
+                        ></div>
+                    ))}
+                </div>
+            )}
+
+            {/* Content */}
             <div className="relative z-10 px-4 max-w-4xl mx-auto text-white">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                     Fountain of Peace<br /> AFH LLC
