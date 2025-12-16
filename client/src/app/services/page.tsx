@@ -23,7 +23,8 @@ export default function Services() {
                     const res = await fetch(`${API_URL}/api/images?type=${type}`);
                     const data = await res.json();
                     if (data.length > 0) {
-                        images[type] = `${API_URL}${data[0]}`;
+                        // Cloudinary URLs are already complete
+                        images[type] = data[0];
                     }
                 } catch (err) {
                     console.error(`Failed to fetch ${type} image`);

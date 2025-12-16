@@ -20,7 +20,8 @@ const Hero = () => {
                     if (data.length > 0) {
                         // Append backend images to the default one or replace it
                         // Let's replace the default if user supplied ANY images
-                        setImages(data.map((img: string) => `${API_URL}${img}`));
+                        // Cloudinary URLs are already complete
+                        setImages(data);
                     }
                 }
             } catch (error) {

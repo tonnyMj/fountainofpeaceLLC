@@ -71,21 +71,32 @@ const sendNotification = (data) => {
 };
 
 const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
 
-// ... imports
-
-// Multer Config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, 'image-' + Date.now() + path.extname(file.originalname));
-  }
+// Cloudinary Configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
+// Multer Config - Use memory storage for Cloudinary
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Helper to upload buffer to Cloudinary
+const uploadToCloudinary = (buffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: `fountainofpeace/${folder}` },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -124,10 +135,11 @@ const seedAdmin = async () => {
   }
 };
 
-// Image Model
+// Image Model - Now stores full Cloudinary URL
 // Types: 'hero', 'gallery', 'service_supervision', 'service_healthcare', 'service_adl', 'service_meals', 'service_housekeeping', 'service_social'
 const Image = sequelize.define('Image', {
-  filename: { type: DataTypes.STRING, allowNull: false },
+  filename: { type: DataTypes.STRING, allowNull: false }, // Now stores full Cloudinary URL
+  publicId: { type: DataTypes.STRING, allowNull: true }, // Cloudinary public_id for deletion
   type: { type: DataTypes.STRING, allowNull: false, defaultValue: 'gallery' }
 });
 
@@ -169,15 +181,13 @@ app.get('/api/images', async (req, res) => {
     const { type } = req.query;
     const whereClause = type ? { type } : {};
 
-    // If we have an Image model, query it.
-    // For backwards compatibility with existing files (if any weren't in DB), we might miss them,
-    // but for this task we assume we are moving to DB-based tracking.
     const images = await Image.findAll({
       where: whereClause,
       order: [['createdAt', 'DESC']]
     });
 
-    const imageUrls = images.map(img => `/uploads/${img.filename}`);
+    // Return full URLs directly (now stored as full Cloudinary URLs)
+    const imageUrls = images.map(img => img.filename);
     res.json(imageUrls);
   } catch (error) {
     console.error('Error fetching images:', error);
@@ -185,26 +195,29 @@ app.get('/api/images', async (req, res) => {
   }
 });
 
-// POST /api/upload - Handle multiple image uploads
+// POST /api/upload - Handle multiple image uploads to Cloudinary
 app.post('/api/upload', authenticateToken, upload.array('images', 10), async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: 'No files uploaded.' });
   }
 
-  const type = req.body.type || 'gallery'; // Default to gallery
+  const type = req.body.type || 'gallery';
   const uploadedFiles = [];
 
   try {
-    // Iterate over all uploaded files and save to DB
     for (const file of req.files) {
+      // Upload to Cloudinary
+      const result = await uploadToCloudinary(file.buffer, type);
+
       await Image.create({
-        filename: file.filename,
+        filename: result.secure_url, // Store full Cloudinary URL
+        publicId: result.public_id,  // Store for deletion
         type: type
       });
-      uploadedFiles.push(`/uploads/${file.filename}`);
+      uploadedFiles.push(result.secure_url);
     }
 
-    console.log(`Successfully saved ${uploadedFiles.length} images of type: ${type}`);
+    console.log(`Successfully uploaded ${uploadedFiles.length} images of type: ${type} to Cloudinary`);
 
     res.json({
       message: 'Files uploaded successfully',
@@ -213,34 +226,41 @@ app.post('/api/upload', authenticateToken, upload.array('images', 10), async (re
       count: uploadedFiles.length
     });
   } catch (error) {
-    console.error('Error saving images to DB:', error);
-    res.status(500).json({ error: 'Database error' });
+    console.error('Error uploading to Cloudinary:', error);
+    res.status(500).json({ error: 'Upload failed' });
   }
 });
 
-// DELETE /api/images/:filename - Delete an image
+// DELETE /api/images/:filename - Delete an image from Cloudinary
 app.delete('/api/images/:filename', authenticateToken, async (req, res) => {
   const filename = req.params.filename;
 
   try {
-    // 1. Find the record
-    const image = await Image.findOne({ where: { filename } });
+    // Find by filename (which is now the full URL) or by publicId
+    const image = await Image.findOne({
+      where: {
+        [Sequelize.Op.or]: [
+          { filename: { [Sequelize.Op.like]: `%${filename}%` } },
+          { publicId: { [Sequelize.Op.like]: `%${filename}%` } }
+        ]
+      }
+    });
+
     if (!image) {
-      // Return success even if not found (idempotent) to avoid client-side 404 errors
       return res.json({ message: 'Image already deleted/not found' });
     }
 
-    // 2. Delete from Database
-    await image.destroy();
-
-    // 3. Delete file from filesystem
-    const filePath = path.join(__dirname, 'uploads', filename);
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error('Error deleting file:', err);
-        // Even if file missing, we deleted DB record, so success mostly
+    // Delete from Cloudinary if publicId exists
+    if (image.publicId) {
+      try {
+        await cloudinary.uploader.destroy(image.publicId);
+      } catch (cloudErr) {
+        console.error('Cloudinary deletion error:', cloudErr);
       }
-    });
+    }
+
+    // Delete from Database
+    await image.destroy();
 
     res.json({ message: 'Image deleted successfully' });
   } catch (error) {

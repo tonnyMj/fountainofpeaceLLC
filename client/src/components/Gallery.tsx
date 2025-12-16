@@ -43,7 +43,7 @@ const Gallery = () => {
             {images.map((img, index) => (
                 <div key={index} className="aspect-square relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-shadow">
                     <img
-                        src={`${API_URL}${img}`}
+                        src={img}
                         alt={`Gallery image ${index + 1}`}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />

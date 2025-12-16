@@ -178,7 +178,7 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
                             return (
                                 <div key={index} className="aspect-square relative rounded-lg overflow-hidden border border-gray-200 group">
                                     <img
-                                        src={`${API_URL}${img}`}
+                                        src={img}
                                         alt={`Existing ${index}`}
                                         className="w-full h-full object-cover"
                                     />

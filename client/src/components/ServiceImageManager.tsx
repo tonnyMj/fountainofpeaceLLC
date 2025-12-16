@@ -29,7 +29,8 @@ const ServiceImageManager = ({ }: ServiceImageManagerProps) => {
                 const res = await fetch(`${API_URL}/api/images?type=${service.type}`);
                 const data = await res.json();
                 if (data.length > 0) {
-                    loadedImages[service.type] = `${API_URL}${data[0]}`;
+                    // Cloudinary URLs are already complete
+                    loadedImages[service.type] = data[0];
                 }
             } catch (err) {
                 console.error(`Failed to load image for ${service.type}`);
