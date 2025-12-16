@@ -15,6 +15,7 @@ export default function AdminPage() {
         if (!token) {
             router.push('/login');
         } else {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             setAuthorized(true);
         }
     }, [router]);
@@ -51,7 +52,7 @@ export default function AdminPage() {
                     {/* Gallery Management */}
                     <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
                         <h2 className="text-xl font-bold text-gray-900 mb-6 border-b pb-4">Community Gallery</h2>
-                        <p className="text-sm text-gray-500 mb-4">Upload new photos to the "Our Community Gallery" section.</p>
+                        <p className="text-sm text-gray-500 mb-4">Upload new photos to the &quot;Our Community Gallery&quot; section.</p>
                         <ImageUploader imageType="gallery" />
                     </div>
 

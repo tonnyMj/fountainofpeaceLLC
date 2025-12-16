@@ -6,7 +6,6 @@ import { useToast } from '@/contexts/ToastContext';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-interface ServiceImageManagerProps { }
 
 const serviceTypes = [
     { type: 'service_supervision', label: '24-Hour Supervision' },
@@ -17,7 +16,7 @@ const serviceTypes = [
     { type: 'service_social', label: 'Social Activities' },
 ];
 
-const ServiceImageManager = ({ }: ServiceImageManagerProps) => {
+const ServiceImageManager = () => {
     const { showToast } = useToast();
     const [images, setImages] = useState<Record<string, string>>({});
     const [uploading, setUploading] = useState<string | null>(null);

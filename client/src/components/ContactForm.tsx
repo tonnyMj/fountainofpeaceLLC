@@ -54,7 +54,7 @@ const ContactForm = () => {
                     <CheckCircle size={24} />
                     <div>
                         <p className="font-semibold">Thank you!</p>
-                        <p className="text-sm">Your message has been sent. We'll be in touch shortly.</p>
+                        <p className="text-sm">Your message has been sent. We&apos;ll be in touch shortly.</p>
                     </div>
                 </div>
             )}
@@ -64,7 +64,7 @@ const ContactForm = () => {
                     <AlertCircle size={24} />
                     <div>
                         <p className="font-semibold">Error</p>
-                        <p className="text-sm">Something went wrong. Please try again or call us.</p>
+                        <p className="text-red-500 text-sm mt-2">Something went wrong. Please try again or email us directly at info@fountainofpeacellc.com</p>
                     </div>
                 </div>
             )}

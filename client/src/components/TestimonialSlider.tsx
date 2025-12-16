@@ -30,7 +30,7 @@ const TestimonialSlider = () => {
                     <div className="w-12 h-12 bg-blue-50 text-primary rounded-full flex items-center justify-center mb-6">
                         <Quote size={20} className="fill-current" />
                     </div>
-                    <p className="text-gray-600 mb-6 italic">"{t.text}"</p>
+                    <p className="text-gray-600 mb-6 italic">&quot;{t.text}&quot;</p>
                     <div>
                         <p className="font-bold text-gray-900">{t.author}</p>
                         <p className="text-sm text-gray-500">{t.relation}</p>
