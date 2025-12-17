@@ -22,7 +22,7 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
 
     const fetchExistingImages = async () => {
         try {
-            const response = await fetch(`${API_URL}/api/images?type=${imageType}`);
+            const response = await fetch(`${API_URL}/api/images?type=${imageType}`, { cache: 'no-store' });
             if (response.ok) {
                 const data = await response.json();
                 setExistingImages(data);
@@ -52,10 +52,10 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
 
         setUploading(true);
         const formData = new FormData();
+        formData.append('type', imageType); // Append type FIRST for reliability
         files.forEach((file) => {
-            formData.append('images', file); // Note 'images' matches backend
+            formData.append('images', file);
         });
-        formData.append('type', imageType);
 
         try {
             const token = localStorage.getItem('token');

@@ -15,7 +15,7 @@ const Hero = () => {
     useEffect(() => {
         const fetchImages = async () => {
             try {
-                const response = await fetch(`${API_URL}/api/images?type=hero`);
+                const response = await fetch(`${API_URL}/api/images?type=hero`, { cache: 'no-store' });
                 if (response.ok) {
                     const data = await response.json();
                     if (data.length > 0) {
