@@ -52,10 +52,10 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
 
         setUploading(true);
         const formData = new FormData();
-        formData.append('type', imageType); // Append type FIRST for reliability
         files.forEach((file) => {
             formData.append('images', file);
         });
+        formData.append('type', imageType);
 
         try {
             const token = localStorage.getItem('token');
