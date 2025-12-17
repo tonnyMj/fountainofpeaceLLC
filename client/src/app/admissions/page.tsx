@@ -40,7 +40,7 @@ export default function Admissions() {
                         <div className="w-16 h-16 bg-blue-100 text-primary rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">3</div>
                         <h3 className="text-xl font-bold mb-3">Welcome Home</h3>
                         <p className="text-gray-600">
-                            Complete the paperwork, coordinate the move-in date, and let us welcome your loved one to the Fountain of Hope family.
+                            Complete the paperwork, coordinate the move-in date, and let us welcome your loved one to the Fountain of Peace family.
                         </p>
                     </div>
                 </div>

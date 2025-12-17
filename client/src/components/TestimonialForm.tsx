@@ -103,7 +103,7 @@ const TestimonialForm = ({ isOpen, onClose, onSuccess }: TestimonialFormProps) =
                             <textarea
                                 required
                                 rows={4}
-                                placeholder="Tell us about your time with Fountain of Hope..."
+                                placeholder="Tell us about your time with Fountain of Peace..."
                                 value={formData.text}
                                 onChange={(e) => setFormData({ ...formData, text: e.target.value })}
                                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"

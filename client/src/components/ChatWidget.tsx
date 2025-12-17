@@ -13,7 +13,7 @@ interface Message {
 export default function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        { role: 'assistant', content: 'Hello! I am the automated assistant for Fountain of Hope. How can I help you today?' }
+        { role: 'assistant', content: 'Hello! I am the automated assistant for Fountain of Peace. How can I help you today?' }
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -95,8 +95,8 @@ export default function ChatWidget() {
                                     {m.role === 'user' ? <User size={14} /> : <Bot size={14} />}
                                 </div>
                                 <div className={`p-3 rounded-2xl max-w-[80%] text-sm leading-relaxed shadow-sm ${m.role === 'user'
-                                        ? 'bg-primary text-white rounded-tr-none'
-                                        : 'bg-white text-gray-700 border border-gray-100 rounded-tl-none'
+                                    ? 'bg-primary text-white rounded-tr-none'
+                                    : 'bg-white text-gray-700 border border-gray-100 rounded-tl-none'
                                     }`}>
                                     {m.content}
                                 </div>

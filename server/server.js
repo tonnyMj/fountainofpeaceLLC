@@ -248,7 +248,7 @@ const seedTestimonials = async () => {
   if (count === 0) {
     const testimonials = [
       {
-        text: "Fountain of Hope has been a blessing for our family. The staff treats my mother with such kindness and respect. It truly feels like home.",
+        text: "Fountain of Peace has been a blessing for our family. The staff treats my mother with such kindness and respect. It truly feels like home.",
         author: "Sarah J.",
         relation: "Daughter of Resident"
       },
@@ -481,10 +481,10 @@ app.post('/api/chat', async (req, res) => {
     // Construct conversation history
     const systemMessage = {
       role: "system",
-      content: `You are a helpful and compassionate AI assistant for "Fountain of Hope", an Adult Family Home (AFH) in Spanaway, WA.
+      content: `You are a helpful and compassionate AI assistant for "Fountain of Peace", an Adult Family Home (AFH) in Spanaway, WA.
       
       **Business Details:**
-      - Name: Fountain of Hope AFH LLC
+      - Name: Fountain of Peace AFH LLC
       - Address: 21818 42nd Ave E, Spanaway, WA 98387
       - Phone: (253) 861-1691
       - Email: fopeaceafh@gmail.com
