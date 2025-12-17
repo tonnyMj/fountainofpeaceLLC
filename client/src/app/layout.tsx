@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 };
 
 import { ToastProvider } from '@/contexts/ToastContext';
+import ChatWidget from '@/components/ChatWidget';
 
 export default function RootLayout({
   children,
@@ -37,6 +38,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <ChatWidget />
         </ToastProvider>
       </body>
     </html>
