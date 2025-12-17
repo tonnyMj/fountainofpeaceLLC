@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const { Sequelize, DataTypes } = require('sequelize');
 const path = require('path');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 
 // Load environment variables
 if (process.env.NODE_ENV !== 'production') {
@@ -90,16 +91,55 @@ const Inquiry = sequelize.define('Inquiry', {
   },
 });
 
-// Mock Email Notification
-const sendNotification = (data) => {
+// Email Transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Send Email Notification
+const sendNotification = async (data) => {
   console.log('---------------------------------------------------');
-  console.log('📨 NEW INQUIRY RECEIVED');
-  console.log(`Name: ${data.name}`);
-  console.log(`Email: ${data.email}`);
-  console.log(`Phone: ${data.phone}`);
-  console.log(`Tour Date: ${data.tourDate}`);
-  console.log(`Message: ${data.message}`);
-  console.log('---------------------------------------------------');
+  console.log('📨 Processing New Inquiry...');
+
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.warn('⚠️ EMAIL_USER or EMAIL_PASS missing. Skipping email sending.');
+    // Log to console as fallback
+    console.log(`Name: ${data.name}`);
+    console.log(`Message: ${data.message}`);
+    return;
+  }
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_TO || 'fopeaceafh@gmail.com',
+    subject: `New Inquiry from ${data.name} - Fountain of Peace`,
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+        <h2 style="color: #2F855A;">New Contact / Tour Request</h2>
+        <p>You have received a new message from the website contact form.</p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p><strong>Name:</strong> ${data.name}</p>
+        <p><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
+        <p><strong>Phone:</strong> ${data.phone || 'N/A'}</p>
+        <p><strong>Preferred Tour Date:</strong> ${data.tourDate || 'Not specified'}</p>
+        <p><strong>Message:</strong></p>
+        <blockquote style="background: #f9f9f9; padding: 15px; border-left: 4px solid #2F855A;">
+          ${data.message ? data.message.replace(/\n/g, '<br>') : 'No details provided.'}
+        </blockquote>
+      </div>
+    `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('✅ Email notification sent to fopeaceafh@gmail.com');
+  } catch (error) {
+    console.error('❌ Failed to send email:', error);
+  }
 };
 
 const multer = require('multer');
