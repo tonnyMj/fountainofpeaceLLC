@@ -235,6 +235,71 @@ const seedServiceImages = async () => {
   }
 };
 
+// Testimonial Model
+const Testimonial = sequelize.define('Testimonial', {
+  text: { type: DataTypes.TEXT, allowNull: false },
+  author: { type: DataTypes.STRING, allowNull: false },
+  relation: { type: DataTypes.STRING, allowNull: false } // e.g., "Resident", "Daughter"
+});
+
+// Seed Testimonials if empty
+const seedTestimonials = async () => {
+  const count = await Testimonial.count();
+  if (count === 0) {
+    const testimonials = [
+      {
+        text: "Fountain of Hope has been a blessing for our family. The staff treats my mother with such kindness and respect. It truly feels like home.",
+        author: "Sarah J.",
+        relation: "Daughter of Resident"
+      },
+      {
+        text: "The facility is beautiful and always clean. But what stands out most is the genuine care. Dad loves the daily activities and the food!",
+        author: "Michael T.",
+        relation: "Son of Resident"
+      },
+      {
+        text: "Moving here was the best decision. I've made so many friends and the nurses are wonderful. I feel safe and happy.",
+        author: "Eleanor R.",
+        relation: "Resident"
+      }
+    ];
+    await Testimonial.bulkCreate(testimonials);
+    console.log('Seeded default testimonials');
+  }
+};
+
+// GET /api/testimonials
+app.get('/api/testimonials', async (req, res) => {
+  try {
+    const testimonials = await Testimonial.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(testimonials);
+  } catch (error) {
+    console.error('Error fetching testimonials:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// POST /api/testimonials
+app.post('/api/testimonials', async (req, res) => {
+  try {
+    const { text, author, relation } = req.body;
+    if (!text || !author) {
+      return res.status(400).json({ error: 'Message and name are required.' });
+    }
+    const newTestimonial = await Testimonial.create({
+      text,
+      author,
+      relation: relation || 'Visitor'
+    });
+    res.status(201).json(newTestimonial);
+  } catch (error) {
+    console.error('Error creating testimonial:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // Login Route
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
@@ -269,7 +334,7 @@ app.get('/api/images', async (req, res) => {
 });
 
 // POST /api/upload - Handle multiple image uploads to Cloudinary
-app.post('/api/upload', authenticateToken, upload.array('images', 10), async (req, res) => {
+app.post('/api/upload', authenticateToken, upload.array('images', 50), async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: 'No files uploaded.' });
   }
@@ -401,6 +466,7 @@ sequelize.sync({ alter: true })
     console.log('Database synced successfully.');
     await seedAdmin(); // Create default admin
     await seedServiceImages(); // Seed default service images
+    await seedTestimonials(); // Seed default testimonials
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
