@@ -68,7 +68,8 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
             });
 
             if (!response.ok) {
-                throw new Error('Upload failed');
+                const errorData = await response.json();
+                throw new Error(errorData.details || errorData.error || 'Upload failed');
             }
 
             const data = await response.json();
@@ -85,7 +86,9 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
             if (onUploadSuccess) onUploadSuccess();
         } catch (err: any) {
             console.error(err);
-            showToast('Failed to upload images. Please try again.', 'error');
+            let errorMsg = 'Failed to upload images.';
+            if (err.message) errorMsg += ` ${err.message}`;
+            showToast(errorMsg, 'error');
         } finally {
             setUploading(false);
         }
