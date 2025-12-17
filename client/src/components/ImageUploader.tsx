@@ -72,6 +72,8 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
             }
 
             const data = await response.json();
+            // Debug Alert - Remove after fixing
+            alert(`Debug Success! Uploaded: ${data.count}. API: ${API_URL}`);
             showToast(`Successfully uploaded ${data.count || 1} images!`, 'success');
 
             setFiles([]);
@@ -83,8 +85,10 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
             fetchExistingImages();
 
             if (onUploadSuccess) onUploadSuccess();
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
+            // Debug Alert - Remove after fixing
+            alert(`Debug Error: ${err.message || err}. API: ${API_URL}`);
             showToast('Failed to upload images. Please try again.', 'error');
         } finally {
             setUploading(false);
