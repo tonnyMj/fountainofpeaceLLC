@@ -451,6 +451,71 @@ app.get('/api/inquiries', async (req, res) => {
   }
 });
 
+// OpenAI Configuration
+const OpenAI = require('openai');
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY // Must be set in Render
+});
+
+// POST /api/chat - AI Chatbot Endpoint
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, history } = req.body;
+
+    // Construct conversation history
+    const systemMessage = {
+      role: "system",
+      content: `You are a helpful and compassionate AI assistant for "Fountain of Hope", an Adult Family Home (AFH) in Spanaway, WA.
+      
+      **Business Details:**
+      - Name: Fountain of Hope AFH LLC
+      - Address: 21818 42nd Ave E, Spanaway, WA 98387
+      - Phone: (253) 861-1691
+      - Email: fopeaceafh@gmail.com
+      - Manager/Owner: Tony
+      
+      **Services:**
+      - 24/7 Professional Care & Supervision
+      - Medication Management & Administration
+      - Home-Cooked Nutritious Meals (Dietary accommodations available)
+      - Assistance with Activities of Daily Living (ADLs): Bathing, dressing, grooming.
+      - Housekeeping & Laundry
+      - Social Activities & Community Engagement
+      - Healthcare Coordination (Appointments, Pharmacy)
+      
+      **Tone & Guidelines:**
+      - Be warm, welcoming, and reassuring. Choosing an AFH is an emotional decision.
+      - Keep answers concise and easier to read (use bullet points if listing things).
+      - If asked about pricing or specific availability, say: "Please contact us directly at (253) 861-1691 for current availability and rates."
+      - Encouraging Call to Action: "Would you like to schedule a tour?"
+      `
+    };
+
+    const messages = [
+      systemMessage,
+      ...(history || []), // Previous context
+      { role: "user", content: message }
+    ];
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo", // Cost-effective and fast
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 200
+    });
+
+    const reply = completion.choices[0].message.content;
+    res.json({ reply });
+
+  } catch (error) {
+    console.error('OpenAI Error:', error);
+    // Fallback response if API fails (e.g. invalid key)
+    res.json({
+      reply: "I'm currently having trouble connecting to my brain, but our staff is ready to help! Please call us at (253) 861-1691."
+    });
+  }
+});
+
 // Global Error Handling Middleware - MUST be last
 app.use((err, req, res, next) => {
   console.error('Unhandled Error:', err);
