@@ -386,6 +386,15 @@ app.get('/api/inquiries', async (req, res) => {
   }
 });
 
+// Global Error Handling Middleware - MUST be last
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', err);
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: 'File Upload Error', details: err.message });
+  }
+  res.status(500).json({ error: 'Internal Server Error', details: err.message });
+});
+
 // Sync Database and Start Server
 sequelize.sync({ alter: true })
   .then(async () => {
