@@ -453,12 +453,28 @@ app.get('/api/inquiries', async (req, res) => {
 
 // OpenAI Configuration
 const OpenAI = require('openai');
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY // Must be set in Render
-});
+let openai;
+
+try {
+  if (process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+  } else {
+    console.warn('OPENAI_API_KEY is missing. Chatbot features will be disabled.');
+  }
+} catch (err) {
+  console.warn('Failed to initialize OpenAI:', err.message);
+}
 
 // POST /api/chat - AI Chatbot Endpoint
 app.post('/api/chat', async (req, res) => {
+  if (!openai) {
+    return res.json({
+      reply: "I'm currently undergoing maintenance (API Key missing). Please call us at (253) 861-1691 for immediate assistance."
+    });
+  }
+
   try {
     const { message, history } = req.body;
 
