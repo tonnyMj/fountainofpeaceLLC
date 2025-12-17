@@ -14,12 +14,30 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // CORS Configuration
+// CORS Configuration
 const allowedOrigins = process.env.FRONTEND_URLS
   ? process.env.FRONTEND_URLS.split(',')
   : ['http://localhost:3000'];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // Check if origin is in the allowed list
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+
+    // Allow all Vercel preview deployments for this project
+    // Matches any vercel.app subdomain containing 'fountainofpeace'
+    if (origin.endsWith('.vercel.app') && origin.includes('fountainofpeace')) {
+      return callback(null, true);
+    }
+
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
+  },
   credentials: true
 }));
 app.use(bodyParser.json());
