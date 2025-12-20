@@ -61,14 +61,14 @@ const Hero = () => {
             {images.map((img, index) => (
                 <div
                     key={index}
-                    className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${index === currentIndex ? 'opacity-50' : 'opacity-0'
+                    className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${index === currentIndex ? 'opacity-100' : 'opacity-0'
                         }`}
                     style={{ backgroundImage: `url("${img}")` }}
                 />
             ))}
 
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 to-gray-900/80 z-0"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-900/40 to-gray-900/70 z-0"></div>
 
             {/* Left Arrow */}
             {images.length > 1 && (

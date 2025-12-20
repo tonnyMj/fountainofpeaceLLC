@@ -17,7 +17,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Welcome to Fountain of Peace AFH LLC</h2>
           <p className="text-lg text-gray-700 leading-relaxed mb-8">
             Our mission is to provide high-quality, individualized care that promotes dignity, independence, and overall well-being.
-            We currently have six available openings and are eager to welcome new residents into our warm, home-like environment.
+            We currently have available openings and are eager to welcome new residents into our warm, home-like environment.
           </p>
           <div className="flex flex-wrap justify-center gap-8 text-primary font-medium">
             <span className="flex items-center gap-2"><HomeIcon size={20} /> Home-like Environment</span>
