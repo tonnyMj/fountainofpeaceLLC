@@ -55,7 +55,12 @@ export default function AdminInquiriesPage() {
 
             if (response.ok) {
                 const data = await response.json();
-                setInquiries(data);
+                // Sanitize data: Default missing status to 'new' for older records
+                const sanitizedData = data.map((item: any) => ({
+                    ...item,
+                    status: item.status || 'new'
+                }));
+                setInquiries(sanitizedData);
             }
         } catch (error) {
             console.error('Error fetching inquiries:', error);
@@ -174,8 +179,8 @@ export default function AdminInquiriesPage() {
                             key={f}
                             onClick={() => setFilter(f as any)}
                             className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === f
-                                    ? 'bg-primary text-white'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                ? 'bg-primary text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
                             {f.charAt(0).toUpperCase() + f.slice(1)}
