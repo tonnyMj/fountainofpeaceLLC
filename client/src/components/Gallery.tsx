@@ -39,14 +39,19 @@ const Gallery = () => {
     }
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {images.map((img, index) => (
-                <div key={index} className="aspect-square relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                    <img
-                        src={img}
-                        alt={`Gallery image ${index + 1}`}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
+                <div key={index} className="group relative">
+                    <div className="aspect-square relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                        <img
+                            src={img}
+                            alt={`Gallery image ${index + 1}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <p className="text-white text-xs text-center truncate">Community Moment</p>
+                        </div>
+                    </div>
                 </div>
             ))}
         </div>
