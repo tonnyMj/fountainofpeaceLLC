@@ -21,18 +21,22 @@ export const metadata: Metadata = {
 
 import { ToastProvider } from '@/contexts/ToastContext';
 import ChatWidget from '@/components/ChatWidget';
+import Analytics from '@/components/Analytics';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID || '';
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
         <ToastProvider>
+          {gaId && <Analytics gaId={gaId} />}
           <Header />
           <main className="flex-grow">
             {children}
