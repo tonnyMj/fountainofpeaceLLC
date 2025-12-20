@@ -1,6 +1,6 @@
 "use client";
 
-import { Quote, PlusCircle } from 'lucide-react';
+import { Quote, PlusCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import TestimonialForm from './TestimonialForm';
 
@@ -17,6 +17,7 @@ const TestimonialSlider = () => {
     const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     const fetchTestimonials = async () => {
         try {
@@ -36,26 +37,80 @@ const TestimonialSlider = () => {
         fetchTestimonials();
     }, []);
 
+    // Auto-advance
+    useEffect(() => {
+        if (testimonials.length <= 1) return;
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+        }, 6000);
+        return () => clearInterval(interval);
+    }, [testimonials.length]);
+
+    const nextSlide = () => {
+        setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+    };
+
+    const prevSlide = () => {
+        setCurrentIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
+    };
+
     return (
-        <div>
+        <div className="max-w-4xl mx-auto">
             {loading ? (
                 <div className="text-center py-12 text-gray-400 animate-pulse">Loading stories...</div>
             ) : testimonials.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">Be the first to share your story!</div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                    {testimonials.map((t) => (
-                        <div key={t.id} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
-                            <div className="w-12 h-12 bg-blue-50 text-primary rounded-full flex items-center justify-center mb-6">
-                                <Quote size={20} className="fill-current" />
-                            </div>
-                            <p className="text-gray-600 mb-6 italic line-clamp-6">&quot;{t.text}&quot;</p>
-                            <div className="mt-auto">
-                                <p className="font-bold text-gray-900">{t.author}</p>
-                                <p className="text-sm text-gray-500">{t.relation}</p>
-                            </div>
+                <div className="relative bg-white rounded-3xl shadow-lg border border-gray-100 p-8 md:p-12 mb-12">
+                    {/* Large Quote Icon Background */}
+                    <div className="absolute top-6 left-8 text-primary/5">
+                        <Quote size={80} className="fill-current" />
+                    </div>
+
+                    {/* Carousel Content */}
+                    <div className="relative z-10 min-h-[250px] flex flex-col justify-center items-center text-center">
+                        <div className="mb-8">
+                            <Quote size={32} className="text-primary mx-auto mb-6 fill-current" />
+                            <p className="text-xl md:text-2xl text-gray-700 font-medium italic leading-relaxed">
+                                &quot;{testimonials[currentIndex].text}&quot;
+                            </p>
                         </div>
-                    ))}
+
+                        <div className="mt-auto">
+                            <h3 className="text-lg font-bold text-gray-900">{testimonials[currentIndex].author}</h3>
+                            <p className="text-primary font-medium">{testimonials[currentIndex].relation}</p>
+                        </div>
+                    </div>
+
+                    {/* Controls */}
+                    {testimonials.length > 1 && (
+                        <>
+                            <button
+                                onClick={prevSlide}
+                                className="absolute left-2 md:-left-5 top-1/2 -translate-y-1/2 bg-white text-gray-400 hover:text-primary p-2 rounded-full shadow-md border border-gray-100 hover:scale-110 transition-all"
+                            >
+                                <ChevronLeft size={24} />
+                            </button>
+                            <button
+                                onClick={nextSlide}
+                                className="absolute right-2 md:-right-5 top-1/2 -translate-y-1/2 bg-white text-gray-400 hover:text-primary p-2 rounded-full shadow-md border border-gray-100 hover:scale-110 transition-all"
+                            >
+                                <ChevronRight size={24} />
+                            </button>
+
+                            {/* Dots */}
+                            <div className="flex justify-center gap-2 mt-8">
+                                {testimonials.map((_, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setCurrentIndex(idx)}
+                                        className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentIndex ? 'bg-primary w-6' : 'bg-gray-200 hover:bg-gray-300'
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
             )}
 
