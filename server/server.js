@@ -89,6 +89,11 @@ const Inquiry = sequelize.define('Inquiry', {
     type: DataTypes.STRING, // Storing as string for simplicity, can be DATE
     allowNull: true,
   },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'new', // Possible values: 'new', 'read', 'replied'
+  },
 });
 
 // Email Transporter
@@ -438,8 +443,8 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
-// GET /api/inquiries - List all inquiries (Admin view - Unsecured for demo)
-app.get('/api/inquiries', async (req, res) => {
+// GET /api/inquiries - List all inquiries (Admin only - Protected)
+app.get('/api/inquiries', authenticateToken, async (req, res) => {
   try {
     const inquiries = await Inquiry.findAll({
       order: [['createdAt', 'DESC']],
@@ -448,6 +453,89 @@ app.get('/api/inquiries', async (req, res) => {
   } catch (error) {
     console.error('Error fetching inquiries:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// PATCH /api/inquiries/:id/status - Update inquiry status
+app.patch('/api/inquiries/:id/status', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!['new', 'read', 'replied'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status value' });
+    }
+
+    const inquiry = await Inquiry.findByPk(id);
+    if (!inquiry) {
+      return res.status(404).json({ error: 'Inquiry not found' });
+    }
+
+    inquiry.status = status;
+    await inquiry.save();
+
+    res.json({ message: 'Status updated successfully', inquiry });
+  } catch (error) {
+    console.error('Error updating inquiry status:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// POST /api/inquiries/:id/reply - Send email reply to inquiry
+app.post('/api/inquiries/:id/reply', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { replyMessage } = req.body;
+
+    if (!replyMessage) {
+      return res.status(400).json({ error: 'Reply message is required' });
+    }
+
+    const inquiry = await Inquiry.findByPk(id);
+    if (!inquiry) {
+      return res.status(404).json({ error: 'Inquiry not found' });
+    }
+
+    // Check email credentials
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      return res.status(500).json({ error: 'Email service not configured' });
+    }
+
+    // Send reply email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: inquiry.email,
+      subject: `Re: Your inquiry to Fountain of Peace`,
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+          <h2 style="color: #2F855A;">Fountain of Peace AFH LLC</h2>
+          <p>Dear ${inquiry.name},</p>
+          <p>Thank you for contacting us. Here's our response:</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #2F855A;">
+            ${replyMessage.replace(/\n/g, '<br>')}
+          </div>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p><strong>Address:</strong> 21818 42nd Ave E, Spanaway, WA 98387</p>
+          <p><strong>Phone:</strong> (253) 861-1691</p>
+          <p><strong>Email:</strong> fopeaceafh@gmail.com</p>
+          <p style="margin-top: 20px; color: #666; font-size: 12px;">This is a reply to your message: "${inquiry.message ? inquiry.message.substring(0, 100) : ''}"</p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    // Update status to 'replied'
+    inquiry.status = 'replied';
+    await inquiry.save();
+
+    console.log(`✅ Reply sent to ${inquiry.email}`);
+    res.json({ message: 'Reply sent successfully', inquiry });
+
+  } catch (error) {
+    console.error('Error sending reply:', error);
+    res.status(500).json({ error: 'Failed to send reply', details: error.message });
   }
 });
 
