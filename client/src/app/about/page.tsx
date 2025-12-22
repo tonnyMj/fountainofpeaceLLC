@@ -22,7 +22,7 @@ export default function About() {
                             Our mission is to provide high-quality, individualized care that promotes dignity, independence, and overall well-being. We are eager to welcome new residents into our warm, home-like environment.
                         </p>
                         <p className="text-gray-700 leading-relaxed">
-                            We currently have six available openings and offer a level of care that prioritizes the comfort and emotional well-being of every resident.
+                            We currently have available openings and offer a level of care that prioritizes the comfort and emotional well-being of every resident.
                         </p>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
