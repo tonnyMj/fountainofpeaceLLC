@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Upload, CheckCircle, AlertCircle, Trash2, X } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
 import ConfirmationModal from './ui/ConfirmationModal';
+import { useRouter } from 'next/navigation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -12,6 +13,7 @@ interface ImageUploaderProps {
 
 const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploaderProps) => {
     const { showToast } = useToast();
+    const router = useRouter();
     const [files, setFiles] = useState<File[]>([]);
     const [uploading, setUploading] = useState(false);
     const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -67,6 +69,12 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
                 body: formData,
             });
 
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem('token');
+                router.push('/login');
+                return;
+            }
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.details || errorData.error || 'Upload failed');
@@ -110,6 +118,12 @@ const ImageUploader = ({ imageType = 'gallery', onUploadSuccess }: ImageUploader
                     'Authorization': `Bearer ${token}`
                 }
             });
+
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem('token');
+                router.push('/login');
+                return;
+            }
 
             // Handle 200 OK or 404 Not Found (already deleted) as success
             if (response.ok || response.status === 404) {

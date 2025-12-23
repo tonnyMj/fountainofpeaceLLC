@@ -44,7 +44,8 @@ export default function InquiryManager() {
                 }
             });
 
-            if (response.status === 401) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem('token');
                 router.push('/login');
                 return;
             }
